@@ -1,0 +1,79 @@
+open System
+
+type Generator() = class
+   let mutable tempList = []
+   let mutable tempString = ""
+   let gen = System.Random()
+   let ran_int = gen.Next()
+   let mutable randomint = 0
+
+//step 1
+   let List_1 = ["I am"]
+
+   let List_4 = ["feeling";"fucking up my life";"sleeping";"hating om everybody";"bringing darkness to my neighborhood";"closing the door to my heart";"feeling so fucking special";"walking this world alone";"kissing this rose of death";"sitting alone in a corner";"killing time";"leaving this world";"stabbing kittens";"crying";"drowning";"suffocating";"kneeling";"hoping for death";"choking";"sinking";"ripping my chest"]
+   let List_5 = ["like a"]
+   let List_6 = ["pleasant";"sencere";"bittersweet";"beasty";"gruesome";"slender";"grim";"depressed";"careless";"manipulative";"obidient";"burried";"pointless";"fallen";"messed up";"corrupt";"hollow";"horrific";"broken";"bloody";"desperate";"lying";"joyless";"dying";"backstabbing";"cowardly";"lonely";"retarded";"lame";"fake";"dark";"fascist";"sulking";"subbing"]
+   let List_7 = ["symptom of cancer";"choice of drugoverdose";"embrace";"chain reaction";"fucking poser";"slut";"sellout";"sinner";"whore";"pit of doom";"chaos";"dark sky";"ocean of broken dreams";"sea of corpses";"crocodile tear"; "kiss made of spikes";"teardrop";"shithole";"corpse";"death angel";"parasite";"demise";"parasite"]
+   //
+   let List_8 = ["Degusted by";"Embracing";"Praying for";"Smashed under";"Thrown over";"Trapped inside";"Left outside";"Floating towards";"Hiding behind";"Dragged into"]
+   let List_9 = ["the"]
+   let List_10 = ["judgemental";"anorexic";"twisted";"greedy";"self absorbed";"deadly";"embarrassing";"ridiculous";"sinful";"hateful";"destructive";"pathetic";"conformist";"imperfect";"perfect";"lifeless";"silent";"blind";"ignorant";"stupid";"fucking"]
+   let List_11 = ["lies";"hatred";"screams";"longing";"disgust";"betrayal";"despair";"fear";"sins";"love";"ignorance";"abnormality";"horror";"terror";"loss";"murder";"beauty";"dishonesty"]
+   let List_12 = ["of my"]
+   let List_13 = ["nemesis";"suicidal neck";"unholy bodyscent";"choir of sorrows";"mind fortress";"so called friends";"ignorant classmates";"black cup of coffee";"sliced wrists";"mom";"parents";"diary";"room";"own living hell";"own emotions";"emotional abyss";"life in darkness";"pale skin";"ugly face";"eternal pain"]
+   //
+   let List_14 = ["My"]
+   let List_15 = ["eyes are";"eyelids are";"veins are";"hands are";"nails are";"uniqueness";"feelings are"; "joy of life is";"good intensions are";"pityful social games are"]
+   let List_17 = ["ruined by";"teared up by";"drowned in";"poisoned with";"struck by";"staged by";"killed by"]
+   let List_18 = ["the virus that is humanity";"agony";"apathy";"dead flowers";"what does not seem to be any of your business";"an outbrake of stupid fakers";"decay";"a black widow";"my own fucking emotions";"baby birds";"crusified souls";"nazi authorities";"inivitable death";"miserable faces";"satans horses";"the coma my life is"]
+   //
+   let List_19 = ["I"]
+   let List_20 = ["will penetrate you like";"will kiss the reaper with";"will strangulate my only love,";"will scream silently at";"show you the reality of";"will be raped by";"will hang myself with";"will commit the perfect suicide along with";"will bring disgrace to";"will spread rabies to";"will never forgive";"will feel forever torn, in love with";"will never forget";"will forever kill";"will forever punish";"will tear apart";"cry for";"will bury";"visit the graveyard with";"cut myself for being in love with"]
+   let List_21 = ["a dead stuffed animal";"these mindless sheeps";"the bacteria of conformism";"the attention whore that is my mother";"the infection that is society";"the white dove";"the perfect person";"the dead flowers";"the full moon";"the innocent child";"the fly on the wall";"this longsome decay of humanity";"my low self esteem";"the reincarnated imbodyment of pain";"the lifeless crowd of annoying yuppies";"the imbodyment of materialism"]
+   let List_22 = ["Karma is a fucking joke";"So fucking typical";"Fuck you, you priviliged doll";"God is obviously unholy";"Time well spend, gosh";"Diary sometimes you are the only one who gets me";"Why even bother trying";"This cosmic bitch can suck my dick";"Seriousleeeh..";"Sadness is an unfortunate destiny";"Roses are red, but I will forever be blue";"Life is a cosmic joke";"Destiny is a tease";"Save my soul from this darkness";"Just call me sick and tired...";"Promises are ment to be broken";"This rotten world is going to hell";"If you love me just let me be..";"Lonelyness is my sancturary";"I tried to be nice, but I don't care anymore";"This so called 'life' makes me laugh.. hah haaah..";"I might scare you, but you don't even know me";"So freaking ironic..";"Stop pretending.. We're not friends..";"You losers don't even know me..";"You know my face but you don't know my story";"Im a mystery.. Not because I want to be. Because I have to be.";"I am the ruler of my own world..";"You are not the boss of me";"You don't get me at all";"Gosh.. Scenario.";"Why make sense of something that is not even there.."]
+
+(*
+joeys world tour
+erotic esfictiation
+grib
+scourge
+reaper
+plague
+belzebub
+whither
+fortitude
+rose
+*)
+   member this.Append(s : string list, newline : bool) =
+      randomint <- gen.Next(0,s.Length) 
+      if newline = true
+      then tempString <- tempString + s.[randomint] + "\n"
+      else tempString <- tempString + s.[randomint] + " "
+
+   member this.MakePoem() =
+      this.Append(List_1,false)
+      this.Append(List_4,false)
+      this.Append(List_5,false)
+      this.Append(List_6,false)
+      this.Append(List_7,true)
+      this.Append(List_8,false)
+      this.Append(List_9,false)
+      this.Append(List_10,false)
+      this.Append(List_11,false)
+      this.Append(List_12,false)
+      this.Append(List_13,true)
+      this.Append(List_14,false)
+      this.Append(List_15,false)
+      this.Append(List_17,false)
+      this.Append(List_18,true)
+      this.Append(List_19,false)
+      this.Append(List_20,false)
+      this.Append(List_21,true)
+      this.Append(List_22,true)
+      printf "%s" (tempString)
+
+end
+
+let Poem = new Generator()
+
+Poem.MakePoem()
