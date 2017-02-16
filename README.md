@@ -1,8 +1,8 @@
 # ImplementeringProgrammeringssprog
 Implementering af programmeringssprog
-\\
-\\compile:
-\\
+
+compile:
+
 \\(inde i fasto)
 \\\$ export PATH=/Library/Frameworks/Mono.framework/Commands:$PATH
 \\\$ make
