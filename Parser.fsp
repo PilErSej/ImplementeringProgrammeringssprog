@@ -1,4 +1,3 @@
-//mono fasto/lib/fsyacc.exe -v --module Parser fasto/src/Parser.fsp
 
 %{
 
@@ -38,25 +37,19 @@ let parse_error_rich =
 %token <int*(int*int)> NUM
 %token <char*(int*int)> CHARLIT
 %token <string*(int*int)> ID STRINGLIT
-%token <(int*int)> IF THEN ELSE LET IN EOF 
+%token <(int*int)> IF THEN ELSE LET IN EOF
 %token <(int*int)> INT CHAR BOOL
-%token <(int*int)> OOR                                   //task 1
-%token <(int*int)> AAND                                  //task 1
 %token <(int*int)> PLUS MINUS LESS
-%token <(int*int)> TIMES DIVIDE                          //task 1
-%token <(int*int)> DEQ LTH EQ OP REDUCE IOTA ARROW NNOT  //task 1
-%token <(int*int)> NEGATE                                //task 1
+%token <(int*int)> TIMES DIVIDE
+%token <(int*int)> AND NOT
+%token <(int*int)> DEQ LTH EQ OP REDUCE IOTA ARROW
 %token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
 %nonassoc ifprec letprec
-%left OOR                 //task 1
-%left AAND                //task 1
-%left DEQ LTH NNOT        //task 1 (NNOT rang?)
+%left DEQ LTH AND NOT
 %left PLUS MINUS
-%left TIMES DIVIDE        //task 1
-%left NEGATE              //task 1  (er ~ left)
-
+%left TIMES DIVIDE
 
 %start Prog
 %type <AbSyn.UntypedProg> Prog
@@ -104,18 +97,14 @@ Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
     | STRINGLIT      { StringLit $1 }
     | LCURLY Exps RCURLY
                      { ArrayLit ($2, (), $1) }
-    | Exp PLUS    Exp  { Plus ($1, $3, $2)   }
-    | Exp MINUS   Exp  { Minus($1, $3, $2)   }
-    | Exp TIMES   Exp  { Times($1, $3, $2)   }   //task 1
-    | Exp DIVIDE  Exp  { Divide($1, $3, $2)  }   //task 1
-    | NEGATE Exp       { Negate($2, $1)  }       //task 1
-    | Exp AAND Exp     { And($1, $3, $2) }       //task 1
-    | Exp OOR Exp      { Or($1, $3, $2)  }       //task 1
-    | NNOT Exp         { Negate($2, $1)  }       //task 1
-
-
-    | Exp DEQ    Exp  { Equal($1, $3, $2)  }
-    | Exp LTH    Exp  { Less ($1, $3, $2)  }
+    | Exp PLUS  Exp  { Plus ($1, $3, $2) }
+    | Exp MINUS Exp  { Minus($1, $3, $2) }
+    | Exp TIMES Exp  { Times($1, $3, $2) }
+    | Exp DIVIDE Exp { Divide($1, $3, $2) }
+    | Exp DEQ   Exp  { Equal($1, $3, $2) }
+    | Exp AND Exp    { And($1, $3, $2) }
+    | NOT Exp        { Not($2, $1) }
+    | Exp LTH   Exp  { Less ($1, $3, $2) }
     | IF Exp THEN Exp ELSE Exp %prec ifprec
                      { If ($2, $4, $6, $1) }
     | ID LPAR Exps RPAR

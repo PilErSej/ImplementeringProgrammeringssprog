@@ -152,6 +152,7 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         match (res1, res2) with
           | (IntVal n1, IntVal n2) -> IntVal (n1-n2)
           | _ -> invalidOperands "Minus on non-integral args: " [(Int, Int)] res1 res2 pos
+
   (* TODO: project task 1:
      Look in `AbSyn.fs` for the arguments of the `Times` 
      (`Divide`,...) expression constructors. 
@@ -161,48 +162,30 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         e.g., `And (e1, e2, pos)` should not evaluate `e2` if `e1` already
               evaluates to false. 
   *)
-//  | Times(_, _, _) ->        
-        //failwith "Unimplemented interpretation of multiplication"
-//  | Divide(_, _, _) ->
-        //failwith "Unimplemented interpretation of division"
-
-
-
-//=================TIMES AND DIVIDE task 1 ====================//
-
-
-  | Times(e1, e2, pos) ->
+  | Times(e1, e2, pos) ->        
         let res1   = evalExp(e1, vtab, ftab)
         let res2   = evalExp(e2, vtab, ftab)
         match (res1, res2) with
           | (IntVal n1, IntVal n2) -> IntVal (n1*n2)
-          | _ -> invalidOperands "Multiplication on non-integral args: " [(Int, Int)] res1 res2 pos
+          | _ -> invalidOperands "Plus on non-integral args: " [(Int, Int)] res1 res2 pos
   | Divide(e1, e2, pos) ->
         let res1   = evalExp(e1, vtab, ftab)
         let res2   = evalExp(e2, vtab, ftab)
         match (res1, res2) with
           | (IntVal n1, IntVal n2) -> IntVal (n1/n2)
-          | _ -> invalidOperands "Divide on non-integral args: " [(Int, Int)] res1 res2 pos
-
-  | And (e1, e2, pos) -> 
-        failwith "Unimplemented interpretation of And"
-
-//        let b1 = evalExp(e1, vtab, ftab)
-//        match b1 with 
-//        |BoolVal true ->  let b2 = evalExp(e2, vtab, ftab)
-//                          match b2 with
-  //                          |b2 -> b2
-    //                        |_ -> invalidOperands "Not cool Not Bool 2 "
-//
-  //      |BoolVal false -> b1
-    //    |_ -> invalidOperands "Not cool Not Bool 1 "
-
-  | Or (e1, e2, pos) ->
-        failwith "Unimplemented interpretation of Or"
-  | Negate(e1, pos) ->
-        failwith "Unimplemented interpretation of negate"
+          | _ -> invalidOperands "Plus on non-integral args: " [(Int, Int)] res1 res2 pos
+  | And (_, _, _) ->
+        failwith "Unimplemented interpretation of &&"
+  | Or (_, _, _) ->
+        failwith "Unimplemented interpretation of ||"
   | Not(e1, pos) ->
-        failwith "Unimplemented interpretation of not"
+        let res1 = evalExp(e1, vtab, ftab)
+        match res1 with
+          | (BoolVal b1) -> BoolVal (not b1)
+          | _ -> raise (MyError("stop lige ", pos))
+  | Negate(_, _) ->
+        failwith "Unimplemented interpretation of negate"
+
   | Equal(e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
         let r2 = evalExp(e2, vtab, ftab)

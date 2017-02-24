@@ -1,12 +1,8 @@
-//mono fasto/lib/fslex.exe fasto/src/Lexer.fsl
 ////////////////////////////////////////////////////////////////////
 // TODO: project task 1 
 //   implement lexer tokens for the new operators: 
-//   (done) multiplication (Times) (*), division (/), 
-//   numerical negation (~), 
-//   logical negation (not), 
-//   logical and (&&), 
-//   logical or (||),
+//   multiplication (*), division (/), numerical negation (~), 
+//   logical negation (not), logical and (&&), logical or (||),
 //   boolean literals (true, false)
 //
 //
@@ -59,6 +55,7 @@ let keyword (s, pos) =
        | "if"           -> Parser.IF pos
        | "then"         -> Parser.THEN pos
        | "else"         -> Parser.ELSE pos
+       | "not"          -> Parser.NOT pos
        | "let"          -> Parser.LET pos
        | "in"           -> Parser.IN pos
        | "int"          -> Parser.INT pos
@@ -66,8 +63,6 @@ let keyword (s, pos) =
        | "char"         -> Parser.CHAR pos
        | "fun"          -> Parser.FUN pos
        | "fn"           -> Parser.FN pos
-       | "not"          -> Parser.NNOT pos
-
 
 (* specials: *)
        | "iota"         -> Parser.IOTA pos
@@ -106,13 +101,10 @@ rule Token = parse
                             let str1 = str0.Substring (1, (String.length str0) - 2)
                             Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
                           }
-  | '*'                   { Parser.TIMES  (getPos lexbuf) }    //task1
-  | '/'                   { Parser.DIVIDE (getPos lexbuf) }    //task1
-  | '~'                   { Parser.NEGATE (getPos lexbuf) }    //task1
-  | '&''&'                { Parser.AAND (getPos lexbuf) }      //task1
-  | '|''|'                { Parser.OOR (getPos lexbuf) }       //task1
   | '+'                   { Parser.PLUS   (getPos lexbuf) }
   | '-'                   { Parser.MINUS  (getPos lexbuf) }
+  | '*'                   { Parser.TIMES  (getPos lexbuf) }
+  | '/'                   { Parser.DIVIDE (getPos lexbuf) }
   | "=>"                  { Parser.ARROW  (getPos lexbuf) }
   | "=="                  { Parser.DEQ    (getPos lexbuf) }
   | '='                   { Parser.EQ     (getPos lexbuf) }

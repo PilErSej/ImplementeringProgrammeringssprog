@@ -113,44 +113,29 @@ and checkExp  (ftab : FunTable)
         let (t2, e2_dec) = checkExp ftab vtab e2
         if (Int = t1 && Int = t2)
         then (Int, Times (e1_dec, e2_dec, pos))
-        else raise (MyError ("In Times: one of subexpression types is not Int: "+ppType t1+" and "+ppType t2, pos))
+        else raise (MyError ("In Plus: one of subexpression types is not Int: "+ppType t1+" and "+ppType t2, pos))
 
     | Divide (e1, e2, pos) ->
         let (t1, e1_dec) = checkExp ftab vtab e1
         let (t2, e2_dec) = checkExp ftab vtab e2
         if (Int = t1 && Int = t2)
         then (Int, Divide (e1_dec, e2_dec, pos))
-        else raise (MyError ("In Divide: one of subexpression types is not Int: "+ppType t1+" and "+ppType t2, pos))
+        else raise (MyError ("In Plus: one of subexpression types is not Int: "+ppType t1+" and "+ppType t2, pos))
 
-    | And (e1, e2, pos) ->
-        failwith "Unimplemented type check of And"
+    | And (_, _, _) ->
+        failwith "Unimplemented type check of &&"
 
-//        let  (t1, e1') = checkExp ftab vtab e1
-//        let  (t2, e2') = checkExp ftab vtab e2
-//        match (t1 = t2, t1) with
-//          | (false, _) -> raise (MyError ( "Cannot compare "+ ppType t1 +
-//                                           "and "+ppType t2+"for equality"
-//                                         , pos ))
-//          | (true, Array _) -> raise (MyError ("Cannot compare arrays", pos))
-//          | _ -> (Bool, Equal (e1', e2', pos))
+    | Or (_, _, _) ->
+        failwith "Unimplemented type check of ||"
 
-    | Or (e1, e2, pos) ->
-        failwith "Unimplemented type check of Or"
-
-//        let  (t1, e1') = checkExp ftab vtab e1
-  //      match t1 with
-    //      | true -> (Bool, Or (e1', e1', pos)) //hvad skal ellers returneres da e2 ikke er evalueret?
-      //    | false -> let  (t2, e2') = checkExp ftab vtab e2
-//            match t2 with
-  //            | true -> (Bool, Or (e1', e2', pos))
-    //          | false -> (Bool, Or (e1', e2', pos))
-      //        | _ -> raise (MyError( "Cannot compare "+ ppType t1 +"and "+ppType t2+"for &&", pos))
-        //  | _ -> raise (MyError( "Cannot compare "+ ppType t1 +"for &&", pos))
     | Not (e1, pos) ->
-        failwith "Unimplemented type check of Not"
+        let (t1, e1_dec) = checkExp ftab vtab e1
+        if (Bool = t1)
+        then (Bool, Not (e1_dec, pos))
+        else raise (MyError ("In Plus: one of subexpression types is not Int: "+ppType t1+" ", pos))
 
-    | Negate (e1, pos) ->
-        failwith "Unimplemented type check of Negate"
+    | Negate (_, _) ->
+        failwith "Unimplemented type check of negate"
 
     (* The types for e1, e2 must be the same. The result is always a Bool. *)
     | Equal (e1, e2, pos) ->
