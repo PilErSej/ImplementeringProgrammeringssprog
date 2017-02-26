@@ -173,10 +173,9 @@ let rec compileExp  (e      : TypedExp)
         [ Mips.LUI (place, makeConst (n / 65536))
         ; Mips.ORI (place, place, makeConst (n % 65536)) ]
 
-  | Constant (BoolVal n, pos) ->   //task 1
-      if (n = true) then [ Mips.LI (place, makeConst 1) ]
-      else [ Mips.LI (place, makeConst 0) ]
-      (* TODO project task 1: represent `true`/`false` values as `1`/`0` *)
+  | Constant (BoolVal n, pos) ->  
+      if (n = true) then [ Mips.LI (place, makeConst 1) ]  //if true then Load Imm. 1
+      else [ Mips.LI (place, makeConst 0) ]                //else (false) then Load Imm. 1
       
   | Constant (CharVal c, pos) -> [ Mips.LI (place, makeConst (int c)) ]
 
