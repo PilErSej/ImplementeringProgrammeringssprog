@@ -96,23 +96,23 @@ rule Token = parse
                             let str1 = str0.Substring (1, (String.length str0) - 2)
                             Parser.STRINGLIT (AbSyn.fromCString str1, getPos lexbuf)
                           }
-  | '+'                   { Parser.PLUS   (getPos lexbuf) }
-  | '-'                   { Parser.MINUS  (getPos lexbuf) }
-  | '*'                   { Parser.TIMES  (getPos lexbuf) }        //lexer token for multiplication (*)
-  | '/'                   { Parser.DIVIDE (getPos lexbuf) }        //lexer token for division (/)
-  | '~'                   { Parser.NEGATE (getPos lexbuf) }        //lexer token for numerical negation ()
-  | '&''&'                { Parser.AND (getPos lexbuf) }           //lexer token for logical and (&&)
-  | '|''|'                { Parser.OR (getPos lexbuf) }            //lexer token for logical or (||)
-  | "=>"                  { Parser.ARROW  (getPos lexbuf) }
-  | "=="                  { Parser.DEQ    (getPos lexbuf) }
-  | '='                   { Parser.EQ     (getPos lexbuf) }
-  | '<'                   { Parser.LTH    (getPos lexbuf) }
-  | '('                   { Parser.LPAR   (getPos lexbuf) }
-  | ')'                   { Parser.RPAR   (getPos lexbuf) }
+  | '+'                   { Parser.PLUS     (getPos lexbuf) }
+  | '-'                   { Parser.MINUS    (getPos lexbuf) }
+  | '*'                   { Parser.TIMES    (getPos lexbuf) }        //lexer token for multiplication (*)
+  | '/'                   { Parser.DIVIDE   (getPos lexbuf) }        //lexer token for division (/)
+  | '~'                   { Parser.NEGATE   (getPos lexbuf) }        //lexer token for numerical negation ()
+  | "&&"                  { Parser.AND      (getPos lexbuf) }        //lexer token for logical and (&&)
+  | "||"                  { Parser.OR       (getPos lexbuf) }        //lexer token for logical or (||)
+  | "=>"                  { Parser.ARROW    (getPos lexbuf) }
+  | "=="                  { Parser.DEQ      (getPos lexbuf) }
+  | '='                   { Parser.EQ       (getPos lexbuf) }
+  | '<'                   { Parser.LTH      (getPos lexbuf) }
+  | '('                   { Parser.LPAR     (getPos lexbuf) }
+  | ')'                   { Parser.RPAR     (getPos lexbuf) }
   | '['                   { Parser.LBRACKET (getPos lexbuf) }
   | ']'                   { Parser.RBRACKET (getPos lexbuf) }
-  | '{'                   { Parser.LCURLY (getPos lexbuf) }
-  | '}'                   { Parser.RCURLY (getPos lexbuf) }
-  | ','                   { Parser.COMMA  (getPos lexbuf) }
-  | eof                   { Parser.EOF    (getPos lexbuf) }
+  | '{'                   { Parser.LCURLY   (getPos lexbuf) }
+  | '}'                   { Parser.RCURLY   (getPos lexbuf) }
+  | ','                   { Parser.COMMA    (getPos lexbuf) }
+  | eof                   { Parser.EOF      (getPos lexbuf) }
   | _                     { lexerError lexbuf "Illegal symbol in input" }
