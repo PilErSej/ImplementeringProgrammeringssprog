@@ -22,13 +22,6 @@ let parse_error_rich =
 //////////////////////////////////////////////////////////////////////
 // TODO: Add new (lexer) token definitions:
 //
-//   TODO: project task 1 :
-//     - multiplication (*), division (/), numerical negation (~), 
-//       logical negation (not), logical and (&&), logical or (||),
-//       boolean literals (true, false)
-//     - add the required precedence and associativity rules for
-//       *, /, ~, not, &&, ||
-//
 //   TODO: project task 2: replicate, map, scan 
 //
 //   TODO: project task 4: range 
@@ -37,26 +30,25 @@ let parse_error_rich =
 %token <int*(int*int)> NUM
 %token <char*(int*int)> CHARLIT
 %token <string*(int*int)> ID STRINGLIT
-%token <bool*(int*int)> BOOLEAN  //task 1
+%token <bool*(int*int)> BOOLEAN                               //token definitions for boolean literals
 %token <(int*int)> IF THEN ELSE LET IN EOF
 %token <(int*int)> INT CHAR BOOL
 %token <(int*int)> PLUS MINUS LESS 
-%token <(int*int)> TIMES DIVIDE //task 1
+%token <(int*int)> TIMES DIVIDE                               //token definitions for multiplication and division
 %token <(int*int)> DEQ LTH EQ OP REDUCE IOTA ARROW
 %token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
-%token <(int*int)> NEGATE      //task 1
-%token <(int*int)> NOT         //task 1
-%token <(int*int)> AND OR      //task 1
+%token <(int*int)> NEGATE NOT                                 //token definitions for numerical- and logical negation
+%token <(int*int)> AND OR                                     //token definition for logical 'and' and 'or' 
 
 %nonassoc ifprec letprec
-%left OR
-%left AND
-%left NOT
+%left OR               //precedence and associativity rules for logical or
+%left AND              //precedence and associativity rules for logical and
+%left NOT              //precedence and associativity rules for logical negation
 %left DEQ LTH
-%left PLUS MINUS
-%left TIMES DIVIDE
-%left NEGATE
+%left PLUS MINUS 
+%left TIMES DIVIDE    //precedence and associativity rules for multiplication and division
+%left NEGATE          //precedence and associativity rules for numerical negation
 
 
 %start Prog
@@ -95,25 +87,25 @@ Params : Type ID COMMA Params
 ;
 
 ///////////////////////////////////////////////////////
-// TODO: project tasks 1,2,4: 
+// TODO: project tasks 2,4: 
 //       add grammer rules for the new expressions
 ///////////////////////////////////////////////////////
 
 Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
     | CHARLIT        { Constant (CharVal (fst $1), snd $1) }
     | ID             { Var $1 }
-    | BOOLEAN        { Constant (BoolVal (fst $1), snd $1) }  //task 1
+    | BOOLEAN        { Constant (BoolVal (fst $1), snd $1) }   //grammer rules for BOOLEAN
     | STRINGLIT      { StringLit $1 }
     | LCURLY Exps RCURLY
                      { ArrayLit ($2, (), $1) }
     | Exp PLUS  Exp  { Plus ($1, $3, $2)  }
     | Exp MINUS Exp  { Minus($1, $3, $2)  }
-    | Exp TIMES Exp  { Times($1, $3, $2)  }              //task 1
-    | Exp DIVIDE Exp { Divide($1, $3, $2) }              //task 1
-    | NOT Exp        { Not($2, $1)        }              //task 1
-    | NEGATE Exp     { Negate($2, $1)     }              //task 1
-    | Exp AND Exp    { And($1, $3, $2)    }              //task 1
-    | Exp OR Exp     { Or($1, $3, $2)     }              //task 1
+    | Exp TIMES Exp  { Times($1, $3, $2)  }              //grammer rules for TIMES
+    | Exp DIVIDE Exp { Divide($1, $3, $2) }              //grammer rules for DIVIDE
+    | NOT Exp        { Not($2, $1)        }              //grammer rules for NOT
+    | NEGATE Exp     { Negate($2, $1)     }              //grammer rules for NEGATE
+    | Exp AND Exp    { And($1, $3, $2)    }              //grammer rules for AND
+    | Exp OR Exp     { Or($1, $3, $2)     }              //grammer rules for OR
 
     | Exp DEQ   Exp  { Equal($1, $3, $2)  }
     | Exp LTH   Exp  { Less ($1, $3, $2)  }
