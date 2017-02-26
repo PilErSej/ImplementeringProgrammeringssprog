@@ -172,9 +172,12 @@ let rec compileExp  (e      : TypedExp)
       else
         [ Mips.LUI (place, makeConst (n / 65536))
         ; Mips.ORI (place, place, makeConst (n % 65536)) ]
-  | Constant (BoolVal _, _) ->
+
+  | Constant (BoolVal n, pos) ->   //task 1
+      if (n = true) then [ Mips.LI (place, makeConst 1) ]
+      else [ Mips.LI (place, makeConst 0) ]
       (* TODO project task 1: represent `true`/`false` values as `1`/`0` *)
-      failwith "Unimplemented code generation of boolean constants"
+      
   | Constant (CharVal c, pos) -> [ Mips.LI (place, makeConst (int c)) ]
 
   (* Create/return a label here, collect all string literals of the program
@@ -252,8 +255,8 @@ let rec compileExp  (e      : TypedExp)
       code1 @ code2 @ [Mips.MUL (place,t1,t2)]
 
   | Divide (e1, e2, pos) ->
-      let t1 = newName "div_L"
-      let t2 = newName "div_R"
+      let t1 = newName "divide_L"
+      let t2 = newName "divide_R"
       let code1 = compileExp e1 vtable t1
       let code2 = compileExp e2 vtable t2
       code1 @ code2 @ [Mips.DIV (place,t1,t2)]
@@ -261,10 +264,14 @@ let rec compileExp  (e      : TypedExp)
   | Not (e1, pos) ->
       let t1 = newName "not"
       let code1 = compileExp e1 vtable t1
-      code1 @ [Mips.XORI (place, t1, "true")]
+      code1 @ [Mips.XORI (place,t1,"1")]
 
-  | Negate (_, _) ->
-      failwith "Unimplemented code generation of negate"
+  | Negate (e1, pos) ->
+      let t1 = newName "neg"
+      let t2 = newName "neg_1"
+      let code1 = compileExp e1 vtable t1
+      let code2 = [Mips.LI(t2, "-1")]          //loads immidiate -1 to register
+      code1 @ code2 @ [Mips.MUL (place,t1,t2)] 
 
   | Let (dec, e1, pos) ->
       let (code1, vtable1) = compileDec dec vtable
@@ -409,11 +416,30 @@ let rec compileExp  (e      : TypedExp)
         in `e1 || e2` if the execution of `e1` will evaluate to `true` then 
         the code of `e2` must not be executed. Similar for `And` (&&). 
   *)
-  | And (_, _, _) ->      
-      failwith "Unimplemented code generation of &&"
+  | And (e1, e2, pos) ->      
+       let t1 = newName"and_L"
+       let code1 = compileExp e1 vtable t1
+       if (code1 = [ Mips.LI (place, makeConst 1) ])
+          then  let t2 = newName"and_R"
+                let code2 = compileExp e2 vtable t2 
+                code1 @ code2 @ [Mips.AND (place,t1,t2)] 
+       else code1 @ code1 @ [Mips.ANDI (place,t1, "0")]
 
-  | Or (_, _, _) ->
-      failwith "Unimplemented code generation of ||"
+  //    failwith "Unimplemented code generation of &&"
+
+  | Or (e1, e2, e3) ->
+       let t1 = newName"or_L"
+       let code1 = compileExp e1 vtable t1
+       if (code1 = [ Mips.LI (place, makeConst 0) ])
+       then let t2 = newName"or_R"
+            let code2 = compileExp e2 vtable t2
+            code1 @ code2 @ [Mips.OR (place,t1,t2)] 
+        else code1 @ code1 @ [Mips.ORI (place,t1, "1")]
+//       let t1 = newName"and_L"
+//       let t2 = newName"and_R"
+//       let code1 = compileExp e1 vtable t1
+//       let code2 = compileExp e2 vtable t2
+//       code1 @ code2 @ [Mips.OR (place,t1,t2)]
 
   (* Indexing:
      1. generate code to compute the index

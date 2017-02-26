@@ -55,7 +55,6 @@ let keyword (s, pos) =
        | "if"           -> Parser.IF pos
        | "then"         -> Parser.THEN pos
        | "else"         -> Parser.ELSE pos
-       | "not"          -> Parser.NOT pos
        | "let"          -> Parser.LET pos
        | "in"           -> Parser.IN pos
        | "int"          -> Parser.INT pos
@@ -69,6 +68,9 @@ let keyword (s, pos) =
        | "reduce"       -> Parser.REDUCE pos
        | "read"         -> Parser.READ pos
        | "write"        -> Parser.WRITE pos
+       | "not"          -> Parser.NOT pos     //task 1
+       | "true"         -> Parser.BOOLEAN (true, pos)  
+       | "false"        -> Parser.BOOLEAN (false, pos)
        | _              -> Parser.ID (s, pos)
 
 }
@@ -103,8 +105,11 @@ rule Token = parse
                           }
   | '+'                   { Parser.PLUS   (getPos lexbuf) }
   | '-'                   { Parser.MINUS  (getPos lexbuf) }
-  | '*'                   { Parser.TIMES  (getPos lexbuf) }
-  | '/'                   { Parser.DIVIDE (getPos lexbuf) }
+  | '*'                   { Parser.TIMES  (getPos lexbuf) }        //task1
+  | '/'                   { Parser.DIVIDE (getPos lexbuf) }        //task1
+  | '~'                   { Parser.NEGATE (getPos lexbuf) }        //task1
+  | '&''&'                { Parser.AND (getPos lexbuf) }       //task 1
+  | '|''|'                { Parser.OR (getPos lexbuf) }       //task 1
   | "=>"                  { Parser.ARROW  (getPos lexbuf) }
   | "=="                  { Parser.DEQ    (getPos lexbuf) }
   | '='                   { Parser.EQ     (getPos lexbuf) }

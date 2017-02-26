@@ -162,29 +162,61 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         e.g., `And (e1, e2, pos)` should not evaluate `e2` if `e1` already
               evaluates to false. 
   *)
-  | Times(e1, e2, pos) ->        
+  | Times(e1, e2, pos) ->
         let res1   = evalExp(e1, vtab, ftab)
         let res2   = evalExp(e2, vtab, ftab)
         match (res1, res2) with
           | (IntVal n1, IntVal n2) -> IntVal (n1*n2)
-          | _ -> invalidOperands "Plus on non-integral args: " [(Int, Int)] res1 res2 pos
+          | _ -> invalidOperands "Times on non-integral args: " [(Int, Int)] res1 res2 pos
+
   | Divide(e1, e2, pos) ->
         let res1   = evalExp(e1, vtab, ftab)
         let res2   = evalExp(e2, vtab, ftab)
         match (res1, res2) with
           | (IntVal n1, IntVal n2) -> IntVal (n1/n2)
-          | _ -> invalidOperands "Plus on non-integral args: " [(Int, Int)] res1 res2 pos
-  | And (_, _, _) ->
-        failwith "Unimplemented interpretation of &&"
-  | Or (_, _, _) ->
+          | _ -> invalidOperands "Divide on non-integral args: " [(Int, Int)] res1 res2 pos
+
+  | And (e1, e2, pos) ->
+        let r1 = evalExp(e1, vtab, ftab)
+        match r1 with
+          | BoolVal true ->  let r2 = evalExp(e2, vtab, ftab)
+                             match r1 with
+                                | BoolVal true ->  BoolVal true
+                                | BoolVal false -> BoolVal false
+                                | _ -> invalidOperands "Invalid equality operand types" [(Int, Int); (Bool, Bool); (Char, Char)] r1 r2 pos
+
+          | BoolVal false ->  BoolVal false
+          | _ -> invalidOperand "Invalid equality operand types" Bool r1 pos
+
+
+  | Or (e1, e2, pos) ->
+        let r1 = evalExp(e1, vtab, ftab)
+        match r1 with
+          | BoolVal false ->  let r2 = evalExp(e2, vtab, ftab)
+                              match r1 with
+                                | BoolVal true ->  BoolVal true
+                                | BoolVal false -> BoolVal false
+                                | _ -> invalidOperands "Invalid equality operand types" [(Int, Int); (Bool, Bool); (Char, Char)] r1 r2 pos
+
+          | BoolVal true ->  BoolVal true
+          | _ -> invalidOperand "Invalid equality operand types" Bool r1 pos
+
+
         failwith "Unimplemented interpretation of ||"
-  | Not(e1, pos) ->
-        let res1 = evalExp(e1, vtab, ftab)
+  | Not(e1, pos) ->    
+        let res1   = evalExp(e1, vtab, ftab)
         match res1 with
-          | (BoolVal b1) -> BoolVal (not b1)
-          | _ -> raise (MyError("stop lige ", pos))
-  | Negate(_, _) ->
-        failwith "Unimplemented interpretation of negate"
+          | BoolVal true -> BoolVal false
+          | BoolVal false -> BoolVal true
+          | _ -> invalidOperand "Not on non-boolean arg: " Bool res1 pos                                     //task 1
+
+//  | Negate (_, _) ->
+//        failwith "Unimplemented interpretation of negate"
+  | Negate(e1, pos) ->                                       //task 1
+        let res1   = evalExp(e1, vtab, ftab)
+        match res1 with
+          | IntVal n1 -> IntVal (n1*(-1))
+          | _ -> invalidOperand "Negate on non-boolean arg: " Int res1 pos 
 
   | Equal(e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
