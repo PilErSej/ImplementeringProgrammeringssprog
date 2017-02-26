@@ -1,0 +1,46 @@
+        CopyConstPropFold.fs
+        
+        | And (e1, e2, pos) ->
+            let e1' = copyConstPropFoldExp vtable e1
+            let e2' = copyConstPropFoldExp vtable e2
+            match (e1', e2') with
+                | (Constant (BoolVal a, _), Constant (BoolVal b, _)) ->
+                    Constant (BoolVal (a && b), pos)
+                | _ -> And (e1', e2', pos)
+                
+      
+      
+       CodeGen.fs
+      
+       | And (e1, e2, pos) ->      
+       let t1 = newName"and_L"
+       let t2 = newName"and_R"
+       let code1 = compileExp e1 vtable t1
+       let code2 = compileExp e2 vtable t2
+       code1 @ code2 @ [Mips.AND (place,t1,t2)]
+       
+       
+       Interpretor.fs
+       
+          | And (e1, e2, pos) ->
+          let r1 = evalExp(e1, vtab, ftab)
+          let r2 = evalExp(e2, vtab, ftab)
+          match (r1, r2) with
+          | (BoolVal n1, BoolVal n2) -> if (n1 = true && n2 = true)
+                                        then BoolVal true
+                                        else BoolVal false
+          | (_, _) -> invalidOperands "Invalid equality operand types" [(Int, Int); (Bool, Bool); (Char, Char)] r1 r2 pos
+          
+    
+     TypeChecker.fs
+     
+     
+        | And (e1, e2, pos) ->
+        let (t1, e1_dec) = checkExp ftab vtab e1
+        let (t2, e2_dec) = checkExp ftab vtab e2
+        if (Bool = t1 && Bool = t2)
+        then (Bool, And (e1_dec, e2_dec, pos))       
+        else failwith "fuck and"
+        
+        
+     
