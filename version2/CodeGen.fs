@@ -173,8 +173,8 @@ let rec compileExp  (e      : TypedExp)
         [ Mips.LUI (place, makeConst (n / 65536))
         ; Mips.ORI (place, place, makeConst (n % 65536)) ]
 
-  | Constant (BoolVal n, pos) ->  
-      if (n = true) then [ Mips.LI (place, makeConst 1) ]  //if true then Load Imm. 1
+  | Constant (BoolVal b, pos) ->  
+      if (b = true) then [ Mips.LI (place, makeConst 1) ]  //if true then Load Imm. 1
       else [ Mips.LI (place, makeConst 0) ]                //else (false) then Load Imm. 1
       
   | Constant (CharVal c, pos) -> [ Mips.LI (place, makeConst (int c)) ]
