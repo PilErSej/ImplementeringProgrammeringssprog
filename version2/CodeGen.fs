@@ -242,36 +242,31 @@ let rec compileExp  (e      : TypedExp)
       let code2 = compileExp e2 vtable t2
       code1 @ code2 @ [Mips.SUB (place,t1,t2)]
 
-  (* TODO project task 1:
-        Look in `AbSyn.fs` for the expression constructors `Times`, ...
-        `Times` and `Divide` are very similar to `Plus`/`Minus`
-        `Not` and `Negate` are simpler; you can use `Mips.XORI` for `Not`
-  *)
   | Times (e1, e2, pos) ->
-      let t1 = newName "times_L"
-      let t2 = newName "times_R"
-      let code1 = compileExp e1 vtable t1
-      let code2 = compileExp e2 vtable t2
-      code1 @ code2 @ [Mips.MUL (place,t1,t2)]
+      let t1 = newName "times_L"                //make temporary symbolic register
+      let t2 = newName "times_R"                //make temporary symbolic register
+      let code1 = compileExp e1 vtable t1       //find Mips instruction list for e1 w/ reg t1
+      let code2 = compileExp e2 vtable t2       //find Mips instruction list for e2 w/ reg t2
+      code1 @ code2 @ [Mips.MUL (place,t1,t2)]  //make Mips instruction list
 
   | Divide (e1, e2, pos) ->
-      let t1 = newName "divide_L"
-      let t2 = newName "divide_R"
-      let code1 = compileExp e1 vtable t1
-      let code2 = compileExp e2 vtable t2
-      code1 @ code2 @ [Mips.DIV (place,t1,t2)]
+      let t1 = newName "divide_L"               //make temporary symbolic register
+      let t2 = newName "divide_R"               //make temporary symbolic register
+      let code1 = compileExp e1 vtable t1       //find Mips instruction list for e1 w/ reg t1
+      let code2 = compileExp e2 vtable t2       //find Mips instruction list for e2 w/ reg t2
+      code1 @ code2 @ [Mips.DIV (place,t1,t2)]  //make Mips instruction list
 
   | Not (e1, pos) ->
-      let t1 = newName "not"
-      let code1 = compileExp e1 vtable t1
-      code1 @ [Mips.XORI (place,t1,"1")]
+      let t1 = newName "not"                   //make temporary symbolic register
+      let code1 = compileExp e1 vtable t1      //find Mips instruction list for e1 w/ reg t1
+      code1 @ [Mips.XORI (place,t1,"1")]       //make Mips instruction list
 
-  | Negate (e1, pos) ->
-      let t1 = newName "neg"
-      let t2 = newName "neg_1"
-      let code1 = compileExp e1 vtable t1
+  | Negate (e1, pos) ->                      
+      let t1 = newName "neg"                   //make temporary symbolic register
+      let t2 = newName "neg_1"                 //make temporary symbolic register
+      let code1 = compileExp e1 vtable t1      //find Mips instruction list for e1 w/ reg t1
       let code2 = [Mips.LI(t2, "-1")]          //loads immidiate -1 to register
-      code1 @ code2 @ [Mips.MUL (place,t1,t2)] 
+      code1 @ code2 @ [Mips.MUL (place,t1,t2)] //make Mips instruction list
 
   | Let (dec, e1, pos) ->
       let (code1, vtable1) = compileDec dec vtable
@@ -417,29 +412,23 @@ let rec compileExp  (e      : TypedExp)
         the code of `e2` must not be executed. Similar for `And` (&&). 
   *)
   | And (e1, e2, pos) ->      
-       let t1 = newName"and_L"
-       let code1 = compileExp e1 vtable t1
-       if (code1 = [ Mips.LI (place, makeConst 1) ])
-          then  let t2 = newName"and_R"
-                let code2 = compileExp e2 vtable t2 
-                code1 @ code2 @ [Mips.AND (place,t1,t2)] 
-       else code1 @ code1 @ [Mips.ANDI (place,t1, "0")]
-
-  //    failwith "Unimplemented code generation of &&"
+       let t1 = newName"and_L"                            //make temporary symbolic register
+       let code1 = compileExp e1 vtable t1                //find Mips instruction list for e1 w/ reg t1
+       if (code1 = [ Mips.LI (place, makeConst 1) ])      //chek if code1 is the Mips instruction simmelar to true
+          then  let t2 = newName"and_R"                   //make temporary symbolic register
+                let code2 = compileExp e2 vtable t2       //find Mips instruction list for e2 w/ reg t2
+                code1 @ code2 @ [Mips.AND (place,t1,t2)]  //make Mips instruction list
+       else code1 @ [Mips.ANDI (place,t1, "0")]           //make Mips instruction list with a false Immediate (0)
 
   | Or (e1, e2, e3) ->
-       let t1 = newName"or_L"
-       let code1 = compileExp e1 vtable t1
-       if (code1 = [ Mips.LI (place, makeConst 0) ])
-       then let t2 = newName"or_R"
-            let code2 = compileExp e2 vtable t2
-            code1 @ code2 @ [Mips.OR (place,t1,t2)] 
-        else code1 @ code1 @ [Mips.ORI (place,t1, "1")]
-//       let t1 = newName"and_L"
-//       let t2 = newName"and_R"
-//       let code1 = compileExp e1 vtable t1
-//       let code2 = compileExp e2 vtable t2
-//       code1 @ code2 @ [Mips.OR (place,t1,t2)]
+       let t1 = newName"or_L"                            //make temporary symbolic register
+       let code1 = compileExp e1 vtable t1               //find Mips instruction list for e1 w/ reg t1
+       if (code1 = [ Mips.LI (place, makeConst 0) ])     //chek if code1 is the Mips instruction simmelar to false
+       then let t2 = newName"or_R"                       //make temporary symbolic register
+            let code2 = compileExp e2 vtable t2          //find Mips instruction list for e2 w/ reg t2
+            code1 @ code2 @ [Mips.OR (place,t1,t2)]      //make Mips instruction list
+        else code1 @ [Mips.ORI (place,t1, "1")]          //make Mips instruction list with a true Immediate (1)
+
 
   (* Indexing:
      1. generate code to compute the index
