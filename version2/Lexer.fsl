@@ -1,11 +1,4 @@
 ////////////////////////////////////////////////////////////////////
-// TODO: project task 1 
-//   implement lexer tokens for the new operators: 
-//   multiplication (*), division (/), numerical negation (~), 
-//   logical negation (not), logical and (&&), logical or (||),
-//   boolean literals (true, false)
-//
-//
 // TODO: project task 2 
 //   implement lexer tokens (keywords) for replicate, map, scan 
 //
@@ -68,9 +61,9 @@ let keyword (s, pos) =
        | "reduce"       -> Parser.REDUCE pos
        | "read"         -> Parser.READ pos
        | "write"        -> Parser.WRITE pos
-       | "not"          -> Parser.NOT pos     //task 1
-       | "true"         -> Parser.BOOLEAN (true, pos)  
-       | "false"        -> Parser.BOOLEAN (false, pos)
+       | "not"          -> Parser.NOT pos                 //lexer token for logical negation (not)
+       | "true"         -> Parser.BOOLEAN (true, pos)     //lexer token for boolean literal true
+       | "false"        -> Parser.BOOLEAN (false, pos)    //lexer token for boolean literal false
        | _              -> Parser.ID (s, pos)
 
 }
@@ -105,11 +98,11 @@ rule Token = parse
                           }
   | '+'                   { Parser.PLUS   (getPos lexbuf) }
   | '-'                   { Parser.MINUS  (getPos lexbuf) }
-  | '*'                   { Parser.TIMES  (getPos lexbuf) }        //task1
-  | '/'                   { Parser.DIVIDE (getPos lexbuf) }        //task1
-  | '~'                   { Parser.NEGATE (getPos lexbuf) }        //task1
-  | '&''&'                { Parser.AND (getPos lexbuf) }       //task 1
-  | '|''|'                { Parser.OR (getPos lexbuf) }       //task 1
+  | '*'                   { Parser.TIMES  (getPos lexbuf) }        //lexer token for multiplication (*)
+  | '/'                   { Parser.DIVIDE (getPos lexbuf) }        //lexer token for division (/)
+  | '~'                   { Parser.NEGATE (getPos lexbuf) }        //lexer token for numerical negation ()
+  | '&''&'                { Parser.AND (getPos lexbuf) }           //lexer token for logical and (&&)
+  | '|''|'                { Parser.OR (getPos lexbuf) }            //lexer token for logical or (||)
   | "=>"                  { Parser.ARROW  (getPos lexbuf) }
   | "=="                  { Parser.DEQ    (getPos lexbuf) }
   | '='                   { Parser.EQ     (getPos lexbuf) }
