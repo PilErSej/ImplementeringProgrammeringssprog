@@ -153,69 +153,55 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
           | (IntVal n1, IntVal n2) -> IntVal (n1-n2)
           | _ -> invalidOperands "Minus on non-integral args: " [(Int, Int)] res1 res2 pos
 
-  (* TODO: project task 1:
-     Look in `AbSyn.fs` for the arguments of the `Times` 
-     (`Divide`,...) expression constructors. 
-        Implementation similar to the cases of Plus/Minus. 
-        Try to pattern match the code above.
-        For `And`/`Or`: make sure to implement the short-circuit semantics,
-        e.g., `And (e1, e2, pos)` should not evaluate `e2` if `e1` already
-              evaluates to false. 
-  *)
   | Times(e1, e2, pos) ->
-        let res1   = evalExp(e1, vtab, ftab)
-        let res2   = evalExp(e2, vtab, ftab)
+        let res1   = evalExp(e1, vtab, ftab)          //evaluates e1
+        let res2   = evalExp(e2, vtab, ftab)          //evaluates e2
         match (res1, res2) with
-          | (IntVal n1, IntVal n2) -> IntVal (n1*n2)
+          | (IntVal n1, IntVal n2) -> IntVal (n1*n2)  //if both IntVal muliplies the together
           | _ -> invalidOperands "Times on non-integral args: " [(Int, Int)] res1 res2 pos
 
   | Divide(e1, e2, pos) ->
-        let res1   = evalExp(e1, vtab, ftab)
-        let res2   = evalExp(e2, vtab, ftab)
+        let res1   = evalExp(e1, vtab, ftab)         //evaluates e1
+        let res2   = evalExp(e2, vtab, ftab)         //evaluates e2
         match (res1, res2) with
-          | (IntVal n1, IntVal n2) -> IntVal (n1/n2)
+          | (IntVal n1, IntVal n2) -> IntVal (n1/n2) //if both IntVal devides them
           | _ -> invalidOperands "Divide on non-integral args: " [(Int, Int)] res1 res2 pos
 
   | And (e1, e2, pos) ->
-        let r1 = evalExp(e1, vtab, ftab)
+        let r1 = evalExp(e1, vtab, ftab)                        //evaluates e1
         match r1 with
-          | BoolVal true ->  let r2 = evalExp(e2, vtab, ftab)
-                             match r1 with
-                                | BoolVal true ->  BoolVal true
-                                | BoolVal false -> BoolVal false
-                                | _ -> invalidOperands "Invalid equality operand types" [(Int, Int); (Bool, Bool); (Char, Char)] r1 r2 pos
+          | BoolVal true ->  let r2 = evalExp(e2, vtab, ftab)   //if true then evaluates e2
+                             match r2 with
+                                | BoolVal n1 ->  BoolVal n1    //the evaluation of e2 decides true or false
+                                | _ ->  invalidOperand "Invalid And operand types" Bool r2 pos
 
-          | BoolVal false ->  BoolVal false
-          | _ -> invalidOperand "Invalid equality operand types" Bool r1 pos
+          | BoolVal false ->  BoolVal false                    //if the evaluation of e1 is false then false
+          | _ -> invalidOperand "Invalid And operand types" Bool r1 pos
 
 
   | Or (e1, e2, pos) ->
-        let r1 = evalExp(e1, vtab, ftab)
+        let r1 = evalExp(e1, vtab, ftab)                       //evaluates e1
         match r1 with
-          | BoolVal false ->  let r2 = evalExp(e2, vtab, ftab)
-                              match r1 with
-                                | BoolVal true ->  BoolVal true
-                                | BoolVal false -> BoolVal false
-                                | _ -> invalidOperands "Invalid equality operand types" [(Int, Int); (Bool, Bool); (Char, Char)] r1 r2 pos
+          | BoolVal false ->  let r2 = evalExp(e2, vtab, ftab) //if false then evaluates e2
+                              match r2 with
+                                | BoolVal n1 ->  BoolVal n1    //the evaluation of e2 decides true or false
+                                | _ -> invalidOperand "Invalid Or operand types" Bool r2 pos
 
-          | BoolVal true ->  BoolVal true
-          | _ -> invalidOperand "Invalid equality operand types" Bool r1 pos
+          | BoolVal true ->  BoolVal true                     //if the evaluation of e1 is true then true
+          | _ -> invalidOperand "Invalid Or operand types" Bool r1 pos
 
 
-        failwith "Unimplemented interpretation of ||"
   | Not(e1, pos) ->    
-        let res1   = evalExp(e1, vtab, ftab)
+        let res1   = evalExp(e1, vtab, ftab)   //evaluates e1
         match res1 with
-          | BoolVal true -> BoolVal false
-          | BoolVal false -> BoolVal true
-          | _ -> invalidOperand "Not on non-boolean arg: " Bool res1 pos                                     //task 1
+          | BoolVal true -> BoolVal false     //if the evaluation of e1 is true then false
+          | BoolVal false -> BoolVal true     //if the evaluation of e1 is false then true
+          | _ -> invalidOperand "Not on non-boolean arg: " Bool res1 pos
 
-//  | Negate (_, _) ->
-//        failwith "Unimplemented interpretation of negate"
-  | Negate(e1, pos) ->                                       //task 1
-        let res1   = evalExp(e1, vtab, ftab)
+  | Negate(e1, pos) ->                                       
+        let res1   = evalExp(e1, vtab, ftab)   //evaluates e1
         match res1 with
-          | IntVal n1 -> IntVal (n1*(-1))
+          | IntVal n1 -> IntVal (n1*(-1))     //if the evaluation of e1 is of type IntVal then multiply w/ -1 
           | _ -> invalidOperand "Negate on non-boolean arg: " Int res1 pos 
 
   | Equal(e1, e2, pos) ->
