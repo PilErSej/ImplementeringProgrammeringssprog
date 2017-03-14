@@ -39,7 +39,7 @@ Typecheker:
                                  , pos)
         //elem_type = the same as the f's result type.
         if   elem_type = f_arg_type && elem_type = n_type then
-             (arr_type, Reduce (f', n_dec, arr_dec, elem_type, pos))  //return type is same as arr_type   
+             (arr_type, Scan (f', n_dec, arr_dec, elem_type, pos))  //return type is same as arr_type   
         elif elem_type = f_arg_type then
              raise (err ("neutral element", n_type))
         else raise (err ("array element", elem_type))
@@ -76,10 +76,11 @@ CodeGen:
 
       let arr_code = compileExp arr_exp vtable arr_reg
 
-      let init_regs = [ Mips.ADDI (res_it_reg, place, "4")
-                      ; Mips.MOVE (i_reg, "0") 
+      let init_regs = [ Mips.MOVE (i_reg, "0") 
                       ; Mips.LW(size_reg, arr_reg, "0")
                       ; Mips.ADDI(arr_reg, arr_reg, "4")]
+                      @ dynalloc (size_reg, place, tp)
+                      @[ Mips.ADDI (res_it_reg, place, "4")]
 
       let acc_code = compileExp acc_exp vtable acc_reg
 
@@ -123,7 +124,6 @@ CodeGen:
       
       arr_code 
       @ init_regs
-      @ dynalloc (size_reg, place, tp)
       @ acc_code 
       @ loop_code 
       @ load_code 
