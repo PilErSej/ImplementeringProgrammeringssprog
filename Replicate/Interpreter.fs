@@ -257,14 +257,14 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         let n1 = evalExp(n, vtab, ftab)
         match n1 with
           | IntVal size ->
-              if (size >= 0) then 
+              if (size > 0) then 
                   let a1 = evalExp(a, vtab, ftab)
-                  let tp = Int
+                  let mutable tp = Int
                   match a1 with
-                    | IntVal _  -> tp = Int 
-                    | BoolVal _ -> tp = Bool
-                    | CharVal _ -> tp = Char
-                    | (ArrayVal (_,tp1)) -> tp = Array tp1 
+                    | IntVal _  -> tp <- Int 
+                    | BoolVal _ -> tp <- Bool
+                    | CharVal _ -> tp <- Char
+                    | (ArrayVal (_,tp1)) -> tp <- Array tp1 
                   ArrayVal( List.map (fun x -> a1 ) [0..size-1], tp )
               else raise (MyError("Replicate argument is not greater than 0: "+ppVal 0 n1, pos))
           | _ -> raise (MyError("Replicate argument is not a number: "+ppVal 0 n1, pos))
