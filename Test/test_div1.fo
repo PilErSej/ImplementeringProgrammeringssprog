@@ -1,0 +1,4 @@
+fun int main() =
+  let a = read(int) in
+  let b = 4 in let c = b/a in
+  write(c)
