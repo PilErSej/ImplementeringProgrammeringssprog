@@ -1,0 +1,27 @@
+ | And (e1, e2, pos) ->      
+       let t1 = newName"and_L"                            //make temporary symbolic register
+       let code1 = compileExp e1 vtable t1 
+
+       let true_reg = newName"true" 
+       let false_reg = newName"false" 
+       
+       let falseLabel = newName "false_lab"
+       let endLabel = newName "end_lab"
+
+       let chek1 = [ Mips.LI (true_reg, makeConst 1) 
+                   ; Mips.LI (false_reg, makeConst 0) 
+                   ; Mips.BNE (t1, true_reg, falseLabel) ]
+
+       let t2 = newName"and_R"                   //make temporary symbolic register
+       let code2 = compileExp e2 vtable t2
+
+       let chek2 = [ Mips.BNE (t1, t2, falseLabel)
+                   ; Mips.AND (place, true_reg, true_reg)
+                   ; Mips.J endLabel  
+                   ; Mips.LABEL falseLabel
+                   ; Mips.AND (place, false_reg, true_reg)
+                   ; Mips.LABEL endLabel ]
+       code1
+       @ chek1
+       @ code2
+       @ chek2
