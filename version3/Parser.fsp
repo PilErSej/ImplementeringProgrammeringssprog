@@ -1,0 +1,152 @@
+
+%{
+
+let p0 = (0,0)
+
+open Microsoft.FSharp.Text.Parsing
+open AbSyn
+
+(* parse-error function *)
+let mutable ErrorContextDescriptor : string = ""
+
+let parse_error_rich =
+  Some (fun (ctxt: ParseErrorContext<_>) ->
+    ErrorContextDescriptor <-
+      match ctxt.CurrentToken with
+      | None -> "At beginning of input\n"
+      | Some token -> sprintf "at token %A\n" token
+  )
+
+%}
+
+//////////////////////////////////////////////////////////////////////
+// TODO: Add new (lexer) token definitions:
+//
+//   TODO: project task 2: replicate, map, scan 
+//
+//   TODO: project task 4: range 
+//////////////////////////////////////////////////////////////////////
+
+%token <int*(int*int)> NUM
+%token <char*(int*int)> CHARLIT
+%token <string*(int*int)> ID STRINGLIT
+%token <bool*(int*int)> BOOLEAN                               //token definitions for boolean literals
+%token <(int*int)> IF THEN ELSE LET IN EOF
+%token <(int*int)> INT CHAR BOOL
+%token <(int*int)> PLUS MINUS LESS 
+%token <(int*int)> TIMES DIVIDE                               //token definitions for multiplication and division
+%token <(int*int)> DEQ LTH EQ OP REDUCE IOTA ARROW 
+%token <(int*int)> REPLICATE SCAN MAP                           //token
+%token <(int*int)> FUN FN COMMA SEMICOLON READ WRITE
+%token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
+%token <(int*int)> NEGATE NOT                                 //token definitions for numerical- and logical negation
+%token <(int*int)> AND OR                                     //token definition for logical 'and' and 'or' 
+
+%nonassoc ifprec letprec
+%left OR               //precedence and associativity rules for logical or
+%right AND              //precedence and associativity rules for logical and
+%left NOT              //precedence and associativity rules for logical negation
+%left DEQ LTH
+%left PLUS MINUS 
+%left TIMES DIVIDE    //precedence and associativity rules for multiplication and division
+%nonassoc NEGATE          //precedence and associativity rules for numerical negation
+%left LPAR RPAR
+
+%start Prog
+%type <AbSyn.UntypedProg> Prog
+%type <AbSyn.UntypedFunDec list> FunDecs
+%type <AbSyn.UntypedFunDec> Fun
+%type <AbSyn.Type> Type
+%type <AbSyn.UntypedExp> Exp
+%type <AbSyn.UntypedExp list> Exps
+%type <AbSyn.UntypedFunArg> FunArg
+
+%%
+
+Prog :    FunDecs EOF   { $1 }
+;
+
+FunDecs : FUN Fun FunDecs { $2 :: $3 }
+        | FUN Fun         { $2 :: [] }
+;
+
+Fun : Type ID LPAR Params RPAR EQ Exp
+           { FunDec (fst $2, $1, $4, $7, snd $2) }
+    | Type ID LPAR RPAR EQ Exp
+           { FunDec (fst $2, $1, [], $6, snd $2) }
+;
+
+Type :   INT                    { AbSyn.Int }
+     |   CHAR                   { AbSyn.Char }
+     |   BOOL                   { AbSyn.Bool }
+     |   LBRACKET Type RBRACKET { AbSyn.Array $2 }
+;
+
+Params : Type ID COMMA Params
+                       { Param (fst $2, $1) :: $4 }
+       | Type ID       { Param (fst $2, $1) :: [] }
+;
+
+///////////////////////////////////////////////////////
+// TODO: project tasks 2,4: 
+//       add grammer rules for the new expressions
+///////////////////////////////////////////////////////
+
+Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
+    | CHARLIT        { Constant (CharVal (fst $1), snd $1) }
+    | ID             { Var $1 }
+    | BOOLEAN        { Constant (BoolVal (fst $1), snd $1) }   //grammer rules for BOOLEAN
+    | STRINGLIT      { StringLit $1 }
+    | LCURLY Exps RCURLY
+                     { ArrayLit ($2, (), $1) }
+    | Exp PLUS  Exp  { Plus ($1, $3, $2)  }
+    | Exp MINUS Exp  { Minus($1, $3, $2)  }
+    | Exp TIMES Exp  { Times($1, $3, $2)  }              //grammer rules for TIMES
+    | Exp DIVIDE Exp { Divide($1, $3, $2) }              //grammer rules for DIVIDE
+    | NOT Exp        { Not($2, $1)        }              //grammer rules for NOT
+    | NEGATE Exp     { Negate($2, $1)     }              //grammer rules for NEGATE
+    | Exp AND Exp    { And($1, $3, $2)    }              //grammer rules for AND
+    | Exp OR Exp     { Or($1, $3, $2)     }              //grammer rules for OR
+
+    | Exp DEQ   Exp  { Equal($1, $3, $2)  }
+    | Exp LTH   Exp  { Less ($1, $3, $2)  }
+    | IF Exp THEN Exp ELSE Exp %prec ifprec
+                     { If ($2, $4, $6, $1) }
+    | ID LPAR Exps RPAR
+                     { Apply (fst $1, $3, snd $1) }
+    | ID LPAR RPAR   { Apply (fst $1, [], snd $1) }
+    | READ LPAR Type RPAR
+                     { Read ($3, $1) }
+    | WRITE LPAR Exp RPAR
+                     { Write ($3, (), $1) }
+    | IOTA LPAR Exp RPAR
+                     { Iota ($3, $1) }
+    | REPLICATE LPAR Exp COMMA Exp RPAR                //grammer rules for REPLICATE
+                     { Replicate ($3, $5, (), $1) }
+    | SCAN LPAR FunArg COMMA Exp COMMA Exp RPAR       
+                     { Scan ($3, $5, $7, (), $1) }
+
+    | MAP LPAR FunArg COMMA Exp RPAR
+                     { Map ($3, $5, (), (), $1)}
+                     
+    | REDUCE LPAR FunArg COMMA Exp COMMA Exp RPAR
+                     { Reduce ($3, $5, $7, (), $1) }
+    | LPAR Exp RPAR  { $2 }
+    | LET ID EQ Exp IN Exp %prec letprec
+                     { Let (Dec (fst $2, $4, $3), $6, $1) }
+    | ID LBRACKET Exp RBRACKET
+                     { Index (fst $1, $3, (), $2) }
+;
+
+Exps : Exp COMMA Exps { $1 :: $3 }
+     | Exp            { $1 :: [] }
+;
+
+FunArg : ID    { FunName (fst $1 ) }
+       | FN Type LPAR RPAR ARROW Exp
+               { Lambda ($2, [], $6, $1) }
+       | FN Type LPAR Params RPAR ARROW Exp
+               { Lambda ($2, $4, $7, $1) }
+;
+
+%%
