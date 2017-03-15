@@ -1,0 +1,28 @@
+  | Or (e1, e2, e3) ->
+
+       let t1 = newName"and_L"                            
+       let code1 = compileExp e1 vtable t1
+
+
+       let trueLabel = newName "true_lab"
+       let endLabel = newName "end_lab"
+       let true_reg = newName"true" 
+       let false_reg = newName"false" 
+
+       let chek1 = [ Mips.LI (true_reg, makeConst 1) 
+                    ; Mips.LI (false_reg, makeConst 0) 
+                    ; Mips.BNE (t1, false_reg, trueLabel) ]
+
+       let t2 = newName"and_R"                   
+       let code2 = compileExp e2 vtable t2
+
+       let chek2 = [ Mips.BNE (t1, t2, trueLabel)
+                   ; Mips.AND (place, false_reg, true_reg)
+                   ; Mips.J endLabel  
+                   ; Mips.LABEL trueLabel
+                   ; Mips.AND (place, true_reg, true_reg)
+                   ; Mips.LABEL endLabel ]
+       code1
+       @ chek1
+       @ code2
+       @ chek2
