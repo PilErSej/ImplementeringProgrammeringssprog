@@ -415,17 +415,17 @@ let rec compileExp  (e      : TypedExp)
        let true_reg = newName"true"          //register for holding a true value
 
        let chek1 = [ Mips.LI (true_reg, makeConst 1)  //setting true register to 1
-                   ; Mips.BNE (t1, true_reg, falseLabel) ] //if t1 is false goto false_Label
+                   ; Mips.BNE (t1, true_reg, false_Label) ] //if t1 is false goto false_Label
 
        let t2 = newName"and_R"                   // register for evaluation of e2
        let code2 = compileExp e2 vtable t2       //evaluate e2 and place result in register
 
-       let chek2 = [ Mips.BNE (t1, t2, falseLabel)        //if t1 is not = t2 goto false_Label
+       let chek2 = [ Mips.BNE (t1, t2, false_Label)        //if t1 is not = t2 goto false_Label
                    ; Mips.AND (place, true_reg, true_reg) //result is true
-                   ; Mips.J endLabel                      // jump to END
-                   ; Mips.LABEL falseLabel                //false label:
+                   ; Mips.J end_Label                      // jump to END
+                   ; Mips.LABEL false_Label                //false label:
                    ; Mips.AND (place, t2, true_reg)       //result is false
-                   ; Mips.LABEL endLabel ]                //END
+                   ; Mips.LABEL end_Label ]                //END
        code1
        @ chek1
        @ code2
@@ -438,24 +438,24 @@ let rec compileExp  (e      : TypedExp)
        let code1 = compileExp e1 vtable t1  //evaluate e1 and place result in register
 
 
-       let trueLabel = newName "true_lab"
-       let endLabel = newName "end_lab"
+       let true_Label = newName "true_lab"
+       let end_Label = newName "end_lab"
        let true_reg = newName"true"       //register for holding a true value
        let false_reg = newName"false"     //register for holding a false value
 
        let chek1 = [ Mips.LI (true_reg, makeConst 1)        //setting true register to 1
                     ; Mips.LI (false_reg, makeConst 0)      //setting false register to 0
-                    ; Mips.BNE (t1, false_reg, trueLabel) ] //if t1 is true goto false_Label
+                    ; Mips.BNE (t1, false_reg, true_Label) ] //if t1 is true goto false_Label
 
        let t2 = newName"and_R"                   //register for evaluation of e2
        let code2 = compileExp e2 vtable t2       //evaluate e2 and place result in register
 
-       let chek2 = [ Mips.BNE (t1, t2, trueLabel)  //if t1 is not = t2 goto true_Label
+       let chek2 = [ Mips.BNE (t1, t2, true_Label)  //if t1 is not = t2 goto true_Label
                    ; Mips.AND (place, false_reg, true_reg) //result is false
-                   ; Mips.J endLabel                       //jump to END
-                   ; Mips.LABEL trueLabel                  //true label:
+                   ; Mips.J end_Label                       //jump to END
+                   ; Mips.LABEL true_Label                  //true label:
                    ; Mips.AND (place, true_reg, true_reg)  //result is true
-                   ; Mips.LABEL endLabel ]                 //END
+                   ; Mips.LABEL end_Label ]                 //END
        code1
        @ chek1
        @ code2
@@ -596,11 +596,11 @@ let rec compileExp  (e      : TypedExp)
       let size_reg = newName "size_reg"              //register for holding size of array
       let n_code = compileExp n_exp vtable size_reg  //evaluate n_exp and place result in size_reg
 
-      let safe_lab = newName "start_lab"
-      let checksize = [ Mips.BGEZ (size_reg, safe_lab) //sizereg >= 0 jump to start_lab
+      let start_lab = newName "start_lab"
+      let checksize = [ Mips.BGEZ (size_reg, start_lab) //sizereg >= 0 jump to start_lab
                       ; Mips.LI ("5", makeConst line)  
                       ; Mips.J "_IllegalArrSizeError_" //jump to error
-                      ; Mips.LABEL (start_lab)          //safe_lab:
+                      ; Mips.LABEL (start_lab)         //start_lab:
                       ]
 
       let a_reg = newName "a_reg"                 // register for evaluation of a_exp
@@ -695,7 +695,7 @@ let rec compileExp  (e      : TypedExp)
 
   | Scan (binop, acc_exp, arr_exp, tp, pos) ->
       let arr_reg  = newName "arr_reg"       //register for evaluation of arr
-      let res_it r_reg = newName "r_reg"     //pointer to result array
+      let r_reg = newName "r_reg"     //pointer to result array
 
       let size_reg = newName "size_reg"  //register for holding size of array
       let i_reg    = newName "i_reg"     //counter register
@@ -745,10 +745,10 @@ let rec compileExp  (e      : TypedExp)
 
       let store_code =
               match getElemSize tp with 
-                | One  -> [ Mips.SB   (acc_reg, res_it_reg, "0")    //if el. size 1, store byte
+                | One  -> [ Mips.SB   (acc_reg, r_reg, "0")    //if el. size 1, store byte
                           ; Mips.ADDI (r_reg, r_reg, "1")           //next space to store 1 ahead
                           ]
-                | Four -> [ Mips.SW (acc_reg, res_it_reg, "0")     //if el. size 4, store byte
+                | Four -> [ Mips.SW (acc_reg, r_reg, "0")     //if el. size 4, store byte
                           ; Mips.ADDI (r_reg, r_reg, "4")          //next space to store 4 ahead
                           ]
       let loop_footer = 
