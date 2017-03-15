@@ -413,8 +413,10 @@ let rec compileExp  (e      : TypedExp)
        let false_Label = newName "false_lab"  
        let end_Label = newName "end_lab"
        let true_reg = newName"true"          //register for holding a true value
+       let false_reg = newName"true"         //register for holding a false value
 
        let chek1 = [ Mips.LI (true_reg, makeConst 1)  //setting true register to 1
+                   ; Mips.LI (false_reg, makeConst 0)  //setting false register to 0
                    ; Mips.BNE (t1, true_reg, false_Label) ] //if t1 is false goto false_Label
 
        let t2 = newName"and_R"                   // register for evaluation of e2
@@ -424,7 +426,7 @@ let rec compileExp  (e      : TypedExp)
                    ; Mips.AND (place, true_reg, true_reg) //result is true
                    ; Mips.J end_Label                      // jump to END
                    ; Mips.LABEL false_Label                //false label:
-                   ; Mips.AND (place, t2, true_reg)       //result is false
+                   ; Mips.AND (place, false_reg, true_reg)       //result is false
                    ; Mips.LABEL end_Label ]                //END
        code1
        @ chek1
