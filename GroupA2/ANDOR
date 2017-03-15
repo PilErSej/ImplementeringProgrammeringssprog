@@ -18,7 +18,7 @@ CodeGen.fs
       
 | Or (e1, e2, e3) ->
        let t1 = newName"or_L"            
-       let t2 = newName"or_R"               //make temporary symbolic register
+       let t2 = newName"or_R"              
        let code1 = compileExp e1 vtable t1
        let code2 = compileExp e2 vtable t2
        let trueLabel = newName "true"
@@ -29,5 +29,5 @@ CodeGen.fs
          [ Mips.BNE (t2,makeConst 0,trueLabel)
          ; Mips.LI (place,"0")
          ; Mips.LABEL trueLabel
-         ]                 //find Mips instruction list for e1 w/ reg t1
+         ]                 
        code1 @ code3 @ code2 @ code4
