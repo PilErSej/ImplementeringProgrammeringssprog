@@ -724,6 +724,7 @@ let rec compileExp  (e      : TypedExp)
         the loop.
   *)
   | Scan (binop, acc_exp, arr_exp, tp, pos) ->
+      let arr_reg  = newName "arr_reg"   (* address of array *)
       let res_it_reg = newName "res_it_reg"
 
       let size_reg = newName "size_reg"  (* size of input array *)
@@ -734,17 +735,19 @@ let rec compileExp  (e      : TypedExp)
       let loop_beg = newName "loop_beg"
       let loop_end = newName "loop_end"
 
-      let arr_reg  = newName "arr_reg"   (* address of array *)
-      let arr_code = compileExp arr_exp vtable arr_reg
-
       let acc_reg = newName "acc_reg"
-      let acc_code = compileExp acc_exp vtable acc_reg
+
+
+      let arr_code = compileExp arr_exp vtable arr_reg
 
       let init_regs = [ Mips.MOVE (i_reg, "0") 
                       ; Mips.LW(size_reg, arr_reg, "0")
+                      ; Mips.ADDI(size_reg, size_reg, "1")
                       ; Mips.ADDI(arr_reg, arr_reg, "4")]
                       @ dynalloc (size_reg, place, tp)
-                      @[Mips.ADDI (res_it_reg, place, "4")]
+                      @[ Mips.ADDI (res_it_reg, place, "4")]
+
+      let acc_code = compileExp acc_exp vtable acc_reg
 
 
       (* Set in_arr_reg to address of first element instead. *)
@@ -785,13 +788,15 @@ let rec compileExp  (e      : TypedExp)
                ]               
       
       arr_code 
-      @ acc_code 
       @ init_regs
+      @ acc_code 
+      @ store_code
       @ loop_code 
       @ load_code 
       @ apply_code 
       @ store_code 
       @ loop_footer
+
 
 and applyFunArg ( ff     : TypedFunArg
                 , args   : Mips.reg list
