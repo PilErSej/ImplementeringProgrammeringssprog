@@ -265,7 +265,7 @@ and checkExp  (ftab : FunTable)
         let (f', f_in, f_out)= //find types of function f
             match checkFunArg ftab vtab pos f with 
               | (f', res, [a]) ->
-                  if elem_type = a
+                  if elem_type = a //element typ should be the same as function argument
                   then (f', a, res)
                   else raise (MyError( "Map1: function input type incompatible with array type ", pos))
               | (_, res, args) ->
@@ -286,8 +286,8 @@ and checkExp  (ftab : FunTable)
 
         let (f', f_arg_type) =
             match checkFunArg ftab vtab pos f with
-              | (f', res, [a1; a2]) ->
-                  if a1 = a2 && a2 = res
+              | (f', res, [a1; a2]) ->   
+                  if a1 = a2 && a2 = res //type of argument 1 and 2 should be the same as the result
                   then (f', res)
                   else raise (MyError( "Scan: incompatible function type of " +
                                        (ppFunArg 0 f) + ": " + showFunType ([a1; a2], res)
